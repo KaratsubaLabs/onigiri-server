@@ -1,3 +1,6 @@
+#![allow(unused)]
+#![allow(dead_code)]
+
 fn main() {
-    println!("Hello, world!");
+    println!("こんにちは世界！");
 }
