@@ -9,4 +9,5 @@ repository = "https://github.com/KaratsubaLabs/onigiri-server"
 
 [dependencies]
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
+pnet = { version = "0.31", features = ["std"] }
 
