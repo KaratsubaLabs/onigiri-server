@@ -1,7 +1,8 @@
 #![allow(unused)]
 #![allow(dead_code)]
 
-pub mod api;
+mod api;
+mod db;
 
 #[macro_use]
 extern crate rocket;
