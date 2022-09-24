@@ -15,3 +15,7 @@ lint:
 
 test:
     cargo test -- --nocapture
+
+repl:
+    surreal sql --conn http://localhost:8000 --user root --pass root --ns test --db test
+
