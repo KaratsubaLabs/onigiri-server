@@ -1,4 +1,5 @@
 use std::path::PathBuf;
+
 use rocket::serde::json::Json;
 use serde::Deserialize;
 
@@ -27,20 +28,17 @@ pub fn list() {
 /// [User Facing] Proxies post request to corresponding device
 #[get("/device/<device_id>/<rest..>")]
 pub fn control_get(device_id: PathBuf, rest: PathBuf) {
-
     // look up device ip
     let id = device_id.to_str().unwrap_or_default();
     let device = db().query_device_by_name(id);
     println!("{:?}", device);
-
-
 }
 
 #[cfg(test)]
 mod tests {
+    use rocket::{http::Status, local::blocking::Client};
+
     use crate::launch;
-    use rocket::local::blocking::Client;
-    use rocket::http::Status;
 
     #[test]
     fn control_get() {

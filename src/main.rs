@@ -9,6 +9,7 @@ extern crate rocket;
 
 #[launch]
 fn launch() -> _ {
-    rocket::build().register("/", api::handlers::catchers())
+    rocket::build()
+        .register("/", api::handlers::catchers())
         .mount("/v1beta", api::v1beta::routes())
 }

@@ -1,4 +1,4 @@
-use rocket::{Request, Catcher};
+use rocket::{Catcher, Request};
 
 #[catch(404)]
 fn not_found(req: &Request) -> String {

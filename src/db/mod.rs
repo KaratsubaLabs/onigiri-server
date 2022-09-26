@@ -6,7 +6,7 @@ use std::net::IpAddr;
 use reqwest::blocking::*;
 
 pub struct DB {
-    pub database_url: String, 
+    pub database_url: String,
     pub namespace: String,
     pub database: String,
     pub username: String,
@@ -24,9 +24,7 @@ pub fn db() -> DB {
 }
 
 impl DB {
-
     fn query(&self, body: &str) -> reqwest::Result<Response> {
-        
         Client::new()
             .post(format!("{}/sql", self.database_url))
             .header("Content-Type", "application/json")
@@ -39,27 +37,37 @@ impl DB {
 
     /// Initial database initalization step
     pub fn migrate(&self) -> reqwest::Result<Response> {
-        
-        self.query(&format!(r#"
+        self.query(&format!(
+            r#"
             DEFINE TABLE users SCHEMAFULL;
             DEFINE FIELD username ON TABLE users TYPE string;
             DEFINE FIELD username ON TABLE password TYPE string;
-        "#))
+        "#
+        ))
     }
 
     // TODO query sanitization
-    pub fn create_user(&self, username: &str, hased_password: &str) -> reqwest::Result<Response>  {
-        self.query(&format!(r#"CREATE users SET username="{0}", password="{1}""#, username, hased_password))
+    pub fn create_user(&self, username: &str, hased_password: &str) -> reqwest::Result<Response> {
+        self.query(&format!(
+            r#"CREATE users SET username="{0}", password="{1}""#,
+            username, hased_password
+        ))
     }
 
     pub fn create_device(&self, name: &str, ip_address: IpAddr) -> reqwest::Result<Response> {
-        self.query(&format!(r#"CREATE devices SET name="{0}", ip_address="{1}""#, name, ip_address.to_string()))
+        self.query(&format!(
+            r#"CREATE devices SET name="{0}", ip_address="{1}""#,
+            name,
+            ip_address.to_string()
+        ))
     }
 
     pub fn query_device_by_name(&self, name: &str) -> reqwest::Result<Response> {
-        self.query(&format!(r#"SELECT * FROM devices WHERE (name == {0})"#, name))
+        self.query(&format!(
+            r#"SELECT * FROM devices WHERE (name == {0})"#,
+            name
+        ))
     }
-
 }
 
 #[cfg(test)]
@@ -75,6 +83,4 @@ mod tests {
     fn create_user() {
         assert!(db().create_user("bill", "abc123").is_ok());
     }
-
-
 }

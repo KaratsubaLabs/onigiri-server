@@ -7,5 +7,5 @@ pub struct User {
 
 pub struct Device {
     pub name: String,
-    pub ip_address: IpAddr
+    pub ip_address: IpAddr,
 }
