@@ -1,7 +1,7 @@
 use rocket::serde::json::Json;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct RegisterBody<'r> {
     username: &'r str,
     password: &'r str,
