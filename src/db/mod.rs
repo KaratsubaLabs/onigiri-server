@@ -56,8 +56,8 @@ impl DB {
         self.query(&format!(r#"CREATE devices SET name="{0}", ip_address="{1}""#, name, ip_address.to_string()))
     }
 
-    pub fn query_device_by_id(&self, id: &str) -> reqwest::Result<Response> {
-        self.query(&format!(r#"SELECT * FROM devices:{0}"#, id))
+    pub fn query_device_by_name(&self, name: &str) -> reqwest::Result<Response> {
+        self.query(&format!(r#"SELECT * FROM devices WHERE (name == {0})"#, name))
     }
 
 }
