@@ -82,6 +82,10 @@ impl DB {
         ))
         .await
     }
+
+    pub async fn query_devices(&self) -> reqwest::Result<Response> {
+        self.query(&format!(r#"SELECT * FROM devices;"#,)).await
+    }
 }
 
 #[cfg(test)]

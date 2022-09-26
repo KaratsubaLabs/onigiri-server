@@ -3,7 +3,7 @@ use std::{
     path::PathBuf,
 };
 
-use rocket::serde::json::Json;
+use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
 
 use crate::db::{db, models::ApiType};
@@ -20,22 +20,35 @@ pub struct RegisterBody<'r> {
 // choose their own ids, which is not the most ideal (you can also easily impersonate devices).
 // maybe give each device their own token after registering (sorta like JWT)
 #[post("/device", data = "<body>")]
-pub async fn register(body: Json<RegisterBody<'_>>) {
-    let res = db().create_device(body.name, body.ip_address).await;
-    println!("{:?}", res);
+pub async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
+    let res = db()
+        .create_device(body.name, body.ip_address)
+        .await
+        .map_err(|f| Status::InternalServerError)?;
+
+    let status = Status::new(res.status().as_u16());
+    Ok(status)
 }
 
 /// [Device Facing]
 // NOTE not sure if this will ever be used
 #[delete("/device/<device_id>")]
-pub fn unregister(device_id: PathBuf) {
+pub async fn unregister(device_id: PathBuf) {
     unimplemented!()
 }
 
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
-pub fn list() {
-    unimplemented!()
+pub async fn list() -> Result<Status, Status> {
+    let res = db()
+        .query_devices()
+        .await
+        .map_err(|f| Status::InternalServerError)?;
+
+    let status = Status::new(res.status().as_u16());
+    let body = res.text().await.map_err(|f| Status::InternalServerError)?;
+    println!("{:?}", body);
+    Ok(status)
 }
 
 /// [User Facing] Proxies post request to corresponding device
@@ -73,5 +86,11 @@ mod tests {
                 api_type: ApiType::LCD,
             })
             .dispatch();
+    }
+
+    #[test]
+    fn list_devices() {
+        let client = Client::tracked(launch()).unwrap();
+        let mut res = client.get("/v1beta/device/").dispatch();
     }
 }
