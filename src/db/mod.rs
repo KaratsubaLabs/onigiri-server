@@ -84,6 +84,14 @@ impl DB {
         .await
     }
 
+    pub async fn query_device_by_id(&self, id: &str) -> reqwest::Result<Response> {
+        self.query(&format!(
+            r#"SELECT * FROM devices:{0}"#,
+            id
+        ))
+        .await
+    }
+
     pub async fn query_devices(&self) -> reqwest::Result<Response> {
         self.query(&format!(r#"SELECT * FROM devices;"#,)).await
     }
