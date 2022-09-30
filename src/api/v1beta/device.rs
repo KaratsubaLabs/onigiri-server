@@ -87,12 +87,14 @@ pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, St
         let device_res = Client::new()
             .get(url)
             .send()
-            .await;
+            .await
+            .unwrap();
 
         println!("{:?}", device_res);
+        return Ok(Status::new(device_res.status().as_u16()))
 
     }
-    Ok(Status::Ok)
+    Ok(Status::InternalServerError)
 }
 
 #[cfg(test)]
