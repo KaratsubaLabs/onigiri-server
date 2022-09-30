@@ -6,8 +6,10 @@ use std::{
 use log::debug;
 use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use reqwest::Client;
 
-use crate::db::{db, models::ApiType};
+use crate::db::{db, models::{ApiType, Device}};
 
 #[derive(Serialize, Deserialize)]
 pub struct RegisterBody<'r> {
@@ -62,11 +64,37 @@ pub async fn list() -> Result<Status, Status> {
 
 /// [User Facing] Proxies post request to corresponding device
 #[get("/device/<device_id>/<rest..>")]
-pub async fn control_get(device_id: PathBuf, rest: PathBuf) {
+pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, Status> {
     // look up device ip
     let id = device_id.to_str().unwrap_or_default();
-    let device = db().query_device_by_name(id).await;
-    debug!("{:?}", device);
+    // TODO not all errors are 404
+    let res = db().query_device_by_id(id).await.map_err(|f| Status::NotFound)?;
+    let body = res.text().await.map_err(|f| Status::InternalServerError)?;
+    let value: Value = serde_json::from_str(&body).map_err(|f| Status::InternalServerError)?;
+
+    // TODO make db response parsing code to db module
+    if let Value::Array(arr) = value {
+        let devices = arr.get(0).and_then(|r| r.get("result")).unwrap();
+
+        // only one device should be returned
+        let device_str = devices.get(0).unwrap().to_string();
+        let device: Device = serde_json::from_str(&device_str).unwrap();
+        // let ip = device.get("ip_address").unwrap().as_str();
+
+        // make request to device
+        let url = format!("http://{0}/{1}", device.ip_address, rest.to_str().unwrap()); 
+        debug!("making request to {}", url);
+        let device_res = Client::new()
+            .get(url)
+            .send()
+            .await
+            .unwrap();
+
+        println!("{:?}", device_res);
+        return Ok(Status::new(device_res.status().as_u16()))
+
+    }
+    Ok(Status::InternalServerError)
 }
 
 #[cfg(test)]

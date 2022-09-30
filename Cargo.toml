@@ -10,7 +10,8 @@ repository = "https://github.com/KaratsubaLabs/onigiri-server"
 [dependencies]
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
-reqwest = { version = "0.11.10", features = ["blocking", "json"] }
+serde_json = "1"
+reqwest = { version = "0.11.10", features = ["json"] }
 anyhow = "1"
 
 log = { version = "0.4" }
