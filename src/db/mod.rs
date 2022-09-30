@@ -3,6 +3,7 @@ pub mod models;
 
 use std::net::{IpAddr, Ipv4Addr};
 
+use log::{debug, info};
 use reqwest::*;
 
 pub struct DB {
@@ -25,7 +26,7 @@ pub fn db() -> DB {
 
 impl DB {
     async fn query(&self, body: &str) -> reqwest::Result<Response> {
-        println!("query: {}", body);
+        debug!("query: {}", body);
         Client::new()
             .post(format!("{}/sql", self.database_url))
             .header("Content-Type", "application/json")

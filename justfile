@@ -2,7 +2,7 @@
 default: debug
 
 debug:
-    cargo run
+    RUST_LOG=onigiri_server=debug,info cargo run
 
 devsetup:
     cp dev/hooks/* .git/hooks
@@ -14,7 +14,7 @@ lint:
     cargo clippy -- -W clippy::unwrap_used -W clippy::cargo
 
 test:
-    cargo test -- --nocapture
+    RUST_LOG=onigiri_server=debug cargo test -- --nocapture
 
 db-up:
     docker run --rm -p 8000:8000 surrealdb/surrealdb:latest start --log debug --user root --pass root memory

@@ -3,6 +3,7 @@ use std::{
     path::PathBuf,
 };
 
+use log::debug;
 use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +28,11 @@ pub async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
         .map_err(|f| Status::InternalServerError)?;
 
     let status = Status::new(res.status().as_u16());
-    Ok(status)
+    if status != Status::Ok {
+        // TODO handle this better
+        return Err(Status::InternalServerError);
+    }
+    Ok(Status::Ok)
 }
 
 /// [Device Facing]
@@ -46,9 +51,13 @@ pub async fn list() -> Result<Status, Status> {
         .map_err(|f| Status::InternalServerError)?;
 
     let status = Status::new(res.status().as_u16());
+    if status != Status::Ok {
+        // TODO handle this better
+        return Err(Status::InternalServerError);
+    }
     let body = res.text().await.map_err(|f| Status::InternalServerError)?;
-    println!("{:?}", body);
-    Ok(status)
+    debug!("{:?}", body);
+    Ok(Status::Ok)
 }
 
 /// [User Facing] Proxies post request to corresponding device
@@ -57,7 +66,7 @@ pub async fn control_get(device_id: PathBuf, rest: PathBuf) {
     // look up device ip
     let id = device_id.to_str().unwrap_or_default();
     let device = db().query_device_by_name(id).await;
-    println!("{:?}", device);
+    debug!("{:?}", device);
 }
 
 #[cfg(test)]
@@ -67,17 +76,17 @@ mod tests {
     use rocket::{http::Status, local::blocking::Client};
 
     use super::RegisterBody;
-    use crate::{db::models::ApiType, launch};
+    use crate::{app, db::models::ApiType};
 
     #[test]
     fn control_get() {
-        let client = Client::tracked(launch()).unwrap();
+        let client = Client::tracked(app()).unwrap();
         let mut res = client.get("/v1beta/device/0/random").dispatch();
     }
 
     #[test]
     fn register_device() {
-        let client = Client::tracked(launch()).unwrap();
+        let client = Client::tracked(app()).unwrap();
         let mut res = client
             .post("/v1beta/device/")
             .json(&RegisterBody {
@@ -90,7 +99,7 @@ mod tests {
 
     #[test]
     fn list_devices() {
-        let client = Client::tracked(launch()).unwrap();
+        let client = Client::tracked(app()).unwrap();
         let mut res = client.get("/v1beta/device/").dispatch();
     }
 }

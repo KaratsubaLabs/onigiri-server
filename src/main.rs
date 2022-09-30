@@ -7,8 +7,18 @@ mod db;
 #[macro_use]
 extern crate rocket;
 
-#[launch]
-fn launch() -> _ {
+#[rocket::main]
+async fn main() -> Result<(), rocket::Error> {
+    env_logger::builder().init();
+
+    log::info!("Starting server...");
+
+    app().launch().await?;
+
+    Ok(())
+}
+
+fn app() -> rocket::Rocket<rocket::Build> {
     rocket::build()
         .register("/", api::handlers::catchers())
         .mount("/v1beta", api::v1beta::routes())
