@@ -7,6 +7,7 @@ use log::debug;
 use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use reqwest::Client;
 
 use crate::db::{db, models::{ApiType, Device}};
 
@@ -70,16 +71,26 @@ pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, St
     let res = db().query_device_by_id(id).await.map_err(|f| Status::NotFound)?;
     let body = res.text().await.map_err(|f| Status::InternalServerError)?;
     let value: Value = serde_json::from_str(&body).map_err(|f| Status::InternalServerError)?;
+
+    // TODO make db response parsing code to db module
     if let Value::Array(arr) = value {
         let devices = arr.get(0).and_then(|r| r.get("result")).unwrap();
 
         // only one device should be returned
         let device_str = devices.get(0).unwrap().to_string();
-        println!("{:?}", device_str);
         let device: Device = serde_json::from_str(&device_str).unwrap();
         // let ip = device.get("ip_address").unwrap().as_str();
 
-        println!("{:?}", device);
+        // make request to device
+        let url = format!("http://{0}/{1}", device.ip_address, rest.to_str().unwrap()); 
+        debug!("making request to {}", url);
+        let device_res = Client::new()
+            .get(url)
+            .send()
+            .await;
+
+        println!("{:?}", device_res);
+
     }
     Ok(Status::Ok)
 }
