@@ -24,16 +24,11 @@ pub struct RegisterBody<'r> {
 // maybe give each device their own token after registering (sorta like JWT)
 #[post("/device", data = "<body>")]
 pub async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
-    let res = db()
+    db()
         .create_device(body.name, body.ip_address)
         .await
         .map_err(|f| Status::InternalServerError)?;
 
-    let status = Status::new(res.status().as_u16());
-    if status != Status::Ok {
-        // TODO handle this better
-        return Err(Status::InternalServerError);
-    }
     Ok(Status::Ok)
 }
 
@@ -47,18 +42,13 @@ pub async fn unregister(device_id: PathBuf) {
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
 pub async fn list() -> Result<Status, Status> {
-    let res = db()
+    let devices = db()
         .query_devices()
         .await
         .map_err(|f| Status::InternalServerError)?;
 
-    let status = Status::new(res.status().as_u16());
-    if status != Status::Ok {
-        // TODO handle this better
-        return Err(Status::InternalServerError);
-    }
-    let body = res.text().await.map_err(|f| Status::InternalServerError)?;
-    debug!("{:?}", body);
+    // debug!("{:?}", body);
+    // TODO return the devices
     Ok(Status::Ok)
 }
 
@@ -68,33 +58,19 @@ pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, St
     // look up device ip
     let id = device_id.to_str().unwrap_or_default();
     // TODO not all errors are 404
-    let res = db().query_device_by_id(id).await.map_err(|f| Status::NotFound)?;
-    let body = res.text().await.map_err(|f| Status::InternalServerError)?;
-    let value: Value = serde_json::from_str(&body).map_err(|f| Status::InternalServerError)?;
+    let device = db().query_device_by_id(id).await.map_err(|f| Status::NotFound)?;
+    // make request to device
+    let url = format!("http://{0}/{1}", device.ip_address, rest.to_str().unwrap()); 
 
-    // TODO make db response parsing code to db module
-    if let Value::Array(arr) = value {
-        let devices = arr.get(0).and_then(|r| r.get("result")).unwrap();
+    debug!("making request to {}", url);
+    let device_res = Client::new()
+        .get(url)
+        .send()
+        .await
+        .unwrap();
 
-        // only one device should be returned
-        let device_str = devices.get(0).unwrap().to_string();
-        let device: Device = serde_json::from_str(&device_str).unwrap();
-        // let ip = device.get("ip_address").unwrap().as_str();
-
-        // make request to device
-        let url = format!("http://{0}/{1}", device.ip_address, rest.to_str().unwrap()); 
-        debug!("making request to {}", url);
-        let device_res = Client::new()
-            .get(url)
-            .send()
-            .await
-            .unwrap();
-
-        println!("{:?}", device_res);
-        return Ok(Status::new(device_res.status().as_u16()))
-
-    }
-    Ok(Status::InternalServerError)
+    println!("{:?}", device_res);
+    Ok(Status::new(device_res.status().as_u16()))
 }
 
 #[cfg(test)]
