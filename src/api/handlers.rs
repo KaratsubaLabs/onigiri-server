@@ -1,4 +1,5 @@
 use rocket::{Catcher, Request};
+use log::error;
 
 #[catch(404)]
 fn not_found(req: &Request) -> String {
@@ -7,6 +8,7 @@ fn not_found(req: &Request) -> String {
 
 #[catch(500)]
 fn internal(req: &Request) -> String {
+    // error!()
     format!("internal server error")
 }
 
