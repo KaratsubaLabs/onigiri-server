@@ -6,7 +6,7 @@ use std::{
 use log::debug;
 use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
+use serde_json::{Value, json};
 use reqwest::Client;
 
 use crate::db::{db, models::{ApiType, Device}};
@@ -24,6 +24,14 @@ pub struct RegisterBody<'r> {
 // maybe give each device their own token after registering (sorta like JWT)
 #[post("/device", data = "<body>")]
 pub async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
+
+    // check device existence (TODO not the best to use only name rn)
+    if let Ok(devices) = db().query_device_by_name(body.name).await {
+        if devices.len() > 0 {
+            return Err(Status::Conflict);
+        }
+    }
+
     db()
         .create_device(body.name, body.ip_address)
         .await
@@ -39,20 +47,22 @@ pub async fn unregister(device_id: PathBuf) {
     unimplemented!()
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct ListResponse {
+    devices: Vec<Device> 
+}
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
-pub async fn list() -> Result<Status, Status> {
+pub async fn list() -> Result<Json<ListResponse>, Status> {
     let devices = db()
         .query_devices()
         .await
         .map_err(|f| Status::InternalServerError)?;
 
-    // debug!("{:?}", body);
-    // TODO return the devices
-    Ok(Status::Ok)
+    Ok(Json(ListResponse { devices }))
 }
 
-/// [User Facing] Proxies post request to corresponding device
+/// [User Facing] Proxies get request to corresponding device
 #[get("/device/<device_id>/<rest..>")]
 pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, Status> {
     // look up device ip
@@ -65,6 +75,26 @@ pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, St
     debug!("making request to {}", url);
     let device_res = Client::new()
         .get(url)
+        .send()
+        .await
+        .unwrap();
+
+    println!("{:?}", device_res);
+    Ok(Status::new(device_res.status().as_u16()))
+}
+
+/// [User Facing] Proxies post request to corresponding device
+#[post("/device/<device_id>/<rest..>", data = "<body>")]
+pub async fn control_post(device_id: PathBuf, rest: PathBuf, body: String) -> Result<Status, Status> {
+    let id = device_id.to_str().unwrap_or_default();
+    // TODO not all errors are 404
+    let device = db().query_device_by_id(id).await.map_err(|f| Status::NotFound)?;
+    let url = format!("http://{0}/{1}", device.ip_address, rest.to_str().unwrap()); 
+
+    debug!("making request to {}", url);
+    let device_res = Client::new()
+        .post(url)
+        .body(body)
         .send()
         .await
         .unwrap();
