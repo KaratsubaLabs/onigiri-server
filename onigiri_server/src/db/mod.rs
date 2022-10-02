@@ -5,10 +5,10 @@ use std::net::{IpAddr, Ipv4Addr};
 
 use log::{debug, info};
 use reqwest::Client;
-use serde::{de::DeserializeOwned, ser};
-use thiserror::Error;
 use rocket::http::Status;
+use serde::{de::DeserializeOwned, ser};
 use serde_json::Value;
+use thiserror::Error;
 
 use self::models::Device;
 
@@ -67,12 +67,14 @@ impl DB {
         let value: Value = serde_json::from_str(&body).map_err(|f| DBError::BodyParseFailed)?;
 
         if let Value::Array(arr) = value {
-            let result = arr.get(0).and_then(|r| r.get("result")).ok_or(DBError::BodyParseFailed)?;
+            let result = arr
+                .get(0)
+                .and_then(|r| r.get("result"))
+                .ok_or(DBError::BodyParseFailed)?;
             Ok(result.to_string())
         } else {
             Err(DBError::BodyParseFailed)
         }
-
     }
 
     async fn query_typed<T: DeserializeOwned>(&self, body: &str) -> Result<T> {
@@ -95,11 +97,7 @@ impl DB {
     }
 
     // TODO query sanitization
-    pub async fn create_user(
-        &self,
-        username: &str,
-        hased_password: &str,
-    ) -> Result<()> {
+    pub async fn create_user(&self, username: &str, hased_password: &str) -> Result<()> {
         self.query(&format!(
             r#"CREATE users SET username="{0}", password="{1}";"#,
             username, hased_password
@@ -108,11 +106,7 @@ impl DB {
         Ok(())
     }
 
-    pub async fn create_device(
-        &self,
-        name: &str,
-        ip_address: Ipv4Addr,
-    ) -> Result<()> {
+    pub async fn create_device(&self, name: &str, ip_address: Ipv4Addr) -> Result<()> {
         self.query(&format!(
             r#"CREATE devices SET name="{0}", ip_address="{1}";"#,
             name,
@@ -132,11 +126,9 @@ impl DB {
 
     /// Returns a single record
     pub async fn query_device_by_id(&self, id: &str) -> Result<Device> {
-        let mut res = self.query_typed::<Vec<Device>>(&format!(
-            r#"SELECT * FROM devices:{0}"#,
-            id
-        ))
-        .await?;
+        let mut res = self
+            .query_typed::<Vec<Device>>(&format!(r#"SELECT * FROM devices:{0}"#, id))
+            .await?;
 
         if res.is_empty() {
             Err(DBError::NoRecords)
@@ -146,7 +138,8 @@ impl DB {
     }
 
     pub async fn query_devices(&self) -> Result<Vec<Device>> {
-        self.query_typed::<Vec<Device>>(&format!(r#"SELECT * FROM devices;"#,)).await
+        self.query_typed::<Vec<Device>>(&format!(r#"SELECT * FROM devices;"#,))
+            .await
     }
 }
 

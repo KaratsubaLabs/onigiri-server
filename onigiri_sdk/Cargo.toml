@@ -8,3 +8,7 @@ description = ""
 repository = "https://github.com/KaratsubaLabs/onigiri-server"
 
 [lib]
+
+[dependencies]
+anyhow = "1"
+thiserror ="1"

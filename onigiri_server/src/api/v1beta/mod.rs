@@ -1,4 +1,4 @@
-use rocket::{Route, http::Status};
+use rocket::{http::Status, Route};
 
 pub mod auth;
 pub mod device;
