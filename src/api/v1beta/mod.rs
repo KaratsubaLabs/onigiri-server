@@ -15,6 +15,7 @@ pub fn routes() -> Vec<Route> {
         auth::login,
         device::register,
         device::list,
-        device::control_get
+        device::control_get,
+        device::control_post
     ]
 }

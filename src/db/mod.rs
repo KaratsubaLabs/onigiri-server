@@ -124,7 +124,7 @@ impl DB {
 
     pub async fn query_device_by_name(&self, name: &str) -> Result<Vec<Device>> {
         self.query_typed::<Vec<Device>>(&format!(
-            r#"SELECT * FROM devices WHERE (name == {0});"#,
+            r#"SELECT * FROM devices WHERE (name == "{0}");"#,
             name
         ))
         .await
