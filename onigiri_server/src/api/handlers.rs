@@ -1,5 +1,5 @@
-use rocket::{Catcher, Request};
 use log::error;
+use rocket::{Catcher, Request};
 
 #[catch(404)]
 fn not_found(req: &Request) -> String {

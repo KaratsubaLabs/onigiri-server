@@ -8,3 +8,8 @@ description = ""
 repository = "https://github.com/KaratsubaLabs/onigiri-server"
 
 [lib]
+
+[dependencies]
+reqwest = { version = "0.11.10", features = ["json"] }
+anyhow = "1"
+thiserror ="1"
