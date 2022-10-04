@@ -8,7 +8,7 @@ pub struct RegisterBody<'r> {
 }
 
 #[post("/register", data = "<body>")]
-pub fn register(body: Json<RegisterBody<'_>>) {}
+pub(crate) fn register(body: Json<RegisterBody<'_>>) {}
 
 #[post("/login")]
-pub fn login() {}
+pub(crate) fn login() {}
