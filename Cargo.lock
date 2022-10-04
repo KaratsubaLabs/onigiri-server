@@ -837,6 +837,7 @@ dependencies = [
  "anyhow",
  "env_logger",
  "log",
+ "onigiri_types",
  "reqwest",
  "rocket",
  "serde",

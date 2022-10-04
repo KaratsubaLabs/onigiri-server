@@ -16,3 +16,8 @@ pub struct Device {
     // pub ip_address: Ipv4Addr,
     // pub api_type: ApiType,
 }
+
+pub struct User {
+    pub username: String,
+    pub hashed_password: String,
+}

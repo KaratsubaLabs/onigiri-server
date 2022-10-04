@@ -4,22 +4,17 @@ use std::{
 };
 
 use log::debug;
+use onigiri_types::{
+    api::v1beta::device::*,
+    db::{ApiType, Device},
+};
 use reqwest::Client;
 use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::db::{
-    db,
-    models::{ApiType, Device},
-};
+use crate::db::db;
 
-#[derive(Serialize, Deserialize)]
-pub struct RegisterBody<'r> {
-    pub name: &'r str,
-    pub ip_address: Ipv4Addr,
-    pub api_type: ApiType,
-}
 /// [Device Facing] A device can ping this endpoint to register themselves
 // TODO device facing endpoints maybe should be under a different path?
 // TODO, should technically be "device/<device_id>"? only issue is that this allows the device
@@ -48,10 +43,6 @@ pub(crate) async fn unregister(device_id: PathBuf) {
     unimplemented!()
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ListResponse {
-    devices: Vec<Device>,
-}
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
 pub(crate) async fn list() -> Result<Json<ListResponse>, Status> {
@@ -109,10 +100,10 @@ pub(crate) async fn control_post(
 mod tests {
     use std::net::Ipv4Addr;
 
+    use onigiri_types::{api::v1beta::device::*, db::ApiType};
     use rocket::{http::Status, local::blocking::Client};
 
-    use super::RegisterBody;
-    use crate::{app, db::models::ApiType};
+    use crate::app;
 
     #[test]
     fn control_get() {

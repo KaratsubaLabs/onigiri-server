@@ -1,16 +1,13 @@
 //! wrapper around surrealdb http interface
-pub mod models;
-
 use std::net::{IpAddr, Ipv4Addr};
 
 use log::{debug, info};
+use onigiri_types::db::Device;
 use reqwest::Client;
 use rocket::http::Status;
 use serde::{de::DeserializeOwned, ser};
 use serde_json::Value;
 use thiserror::Error;
-
-use self::models::Device;
 
 #[derive(Error, Debug)]
 pub enum DBError {

@@ -15,6 +15,6 @@ pub mod device {
 
     #[derive(Serialize, Deserialize)]
     pub struct ListResponse {
-        devices: Vec<Device>,
+        pub devices: Vec<Device>,
     }
 }
