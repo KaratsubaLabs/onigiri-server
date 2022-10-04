@@ -13,3 +13,5 @@ repository = "https://github.com/KaratsubaLabs/onigiri-server"
 reqwest = { version = "0.11.10", features = ["json"] }
 anyhow = "1"
 thiserror ="1"
+
+onigiri_types = { path = "../onigiri_types" }

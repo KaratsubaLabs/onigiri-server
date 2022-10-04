@@ -26,7 +26,7 @@ pub struct RegisterBody<'r> {
 // choose their own ids, which is not the most ideal (you can also easily impersonate devices).
 // maybe give each device their own token after registering (sorta like JWT)
 #[post("/device", data = "<body>")]
-pub async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
+pub(crate) async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
     // check device existence (TODO not the best to use only name rn)
     if let Ok(devices) = db().query_device_by_name(body.name).await {
         if devices.len() > 0 {
@@ -44,7 +44,7 @@ pub async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Status> {
 /// [Device Facing]
 // NOTE not sure if this will ever be used
 #[delete("/device/<device_id>")]
-pub async fn unregister(device_id: PathBuf) {
+pub(crate) async fn unregister(device_id: PathBuf) {
     unimplemented!()
 }
 
@@ -54,7 +54,7 @@ pub struct ListResponse {
 }
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
-pub async fn list() -> Result<Json<ListResponse>, Status> {
+pub(crate) async fn list() -> Result<Json<ListResponse>, Status> {
     let devices = db()
         .query_devices()
         .await
@@ -65,7 +65,7 @@ pub async fn list() -> Result<Json<ListResponse>, Status> {
 
 /// [User Facing] Proxies get request to corresponding device
 #[get("/device/<device_id>/<rest..>")]
-pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, Status> {
+pub(crate) async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, Status> {
     // look up device ip
     let id = device_id.to_str().unwrap_or_default();
     // TODO not all errors are 404
@@ -85,7 +85,7 @@ pub async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, St
 
 /// [User Facing] Proxies post request to corresponding device
 #[post("/device/<device_id>/<rest..>", data = "<body>")]
-pub async fn control_post(
+pub(crate) async fn control_post(
     device_id: PathBuf,
     rest: PathBuf,
     body: String,

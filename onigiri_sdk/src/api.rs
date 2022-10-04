@@ -1,27 +1,32 @@
 //! API calls
+
+use onigiri_types::db::ApiType;
 use reqwest::{Client, Response};
 
-// TODO move to API session struct or something
-const API_URL: &'static str = "localhost:8080/v1beta";
-
-trait Device {
+pub trait Device {
+    const API_TYPE: ApiType;
+    fn get_api_url(&self) -> &str;
     fn get_id(&self) -> &str;
 }
 
 pub struct LCDDevice {
+    api_url: String,
     id: String,
 }
 
 impl LCDDevice {
-    pub fn new(id: &str) -> Result<Self, anyhow::Error> {
-        Ok(LCDDevice { id: id.to_owned() })
+    pub fn new(api_url: &str, id: &str) -> Result<Self, anyhow::Error> {
+        Ok(LCDDevice {
+            api_url: api_url.to_owned(),
+            id: id.to_owned(),
+        })
     }
 
     pub async fn write_line(&self, line: u8, content: String) -> reqwest::Result<Response> {
         Client::new()
             .post(format!(
                 "{}/device/{}/lcd/write/{}",
-                API_URL,
+                self.get_api_url(),
                 self.get_id(),
                 line
             ))
@@ -32,26 +37,28 @@ impl LCDDevice {
 
     pub async fn clear(&self) -> reqwest::Result<Response> {
         Client::new()
-            .post(format!("{}/device/{}/lcd/clear", API_URL, self.get_id()))
+            .post(format!(
+                "{}/device/{}/lcd/clear",
+                self.get_api_url(),
+                self.get_id()
+            ))
             .send()
             .await
     }
 }
 
 impl Device for LCDDevice {
+    const API_TYPE: ApiType = ApiType::LCD;
+
     fn get_id(&self) -> &str {
         &self.id
+    }
+
+    fn get_api_url(&self) -> &str {
+        &self.api_url
     }
 }
 
 pub struct LEDDevice {}
 
 impl LEDDevice {}
-
-// general api calls
-pub async fn get_devices() -> reqwest::Result<Response> {
-    Client::new()
-        .get(format!("{}/device", API_URL))
-        .send()
-        .await
-}
