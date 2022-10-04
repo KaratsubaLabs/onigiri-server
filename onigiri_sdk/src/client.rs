@@ -20,8 +20,11 @@ pub struct Client {
 
 impl Client {
     /// Attempt to connect to the server
-    pub fn connect(api_url: String) -> Result<Client, Error> {
-        Ok(Client { api_url })
+    pub fn connect(api_url: &str) -> Result<Client, Error> {
+        // TODO auth
+        Ok(Client {
+            api_url: api_url.to_owned(),
+        })
     }
 
     /// Get list of all devices that can be claimed
@@ -61,5 +64,34 @@ impl Client {
 
         let device = D::new(&self.api_url, device_id)?;
         Ok(*device)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use onigiri_types::db::ApiType;
+
+    use super::Client;
+    use crate::api::LCDDevice;
+
+    /// This test requires a running onigiri-server instance, with a registered lcd device (it's
+    /// not the greatest test right now)
+    #[tokio::test]
+    async fn lcd_device() -> anyhow::Result<()> {
+        let api_url = "http://127.0.0.1:8080/v1beta";
+        let client = Client::connect(api_url)?;
+
+        let devices = client.get_devices().await?;
+
+        let lcd_device_id = devices
+            .iter()
+            .find(|d| d.api_type == ApiType::LCD)
+            .expect("Could not find device with LCD api_type (this may not be this test's fault)");
+
+        let lcd_device = client.device::<LCDDevice>(&lcd_device_id.id).await?;
+        lcd_device.write_line(1, "hello world").await?;
+
+        Ok(())
     }
 }

@@ -15,3 +15,6 @@ anyhow = "1"
 thiserror ="1"
 
 onigiri_types = { path = "../onigiri_types" }
+
+[dev-dependencies]
+tokio = { version = "1.21", features = ["macros"] }

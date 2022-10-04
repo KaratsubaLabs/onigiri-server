@@ -16,7 +16,7 @@ pub struct LCDDevice {
 }
 
 impl LCDDevice {
-    pub async fn write_line(&self, line: u8, content: String) -> reqwest::Result<Response> {
+    pub async fn write_line(&self, line: u8, content: &str) -> reqwest::Result<Response> {
         Client::new()
             .post(format!(
                 "{}/device/{}/lcd/write/{}",
@@ -24,7 +24,7 @@ impl LCDDevice {
                 self.get_id(),
                 line
             ))
-            .body(content)
+            .body(content.to_owned())
             .send()
             .await
     }

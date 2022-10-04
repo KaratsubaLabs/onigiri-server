@@ -46,10 +46,20 @@ pub(crate) async fn unregister(device_id: PathBuf) {
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
 pub(crate) async fn list() -> Result<Json<ListResponse>, Status> {
-    let devices = db()
+    let mut devices = db()
         .query_devices()
         .await
         .map_err(|f| Status::InternalServerError)?;
+
+    // TODO right now Device id is being returned as `device:<id>`, should really only be `<id>`
+    // fixing it here is just temporary, other routes might also return the device from querying
+    // the db and need to remember to fix it
+    for mut device in devices.iter_mut() {
+        let mut id_pair = device.id.split(':');
+        let _table = id_pair.next().unwrap();
+        let id = id_pair.next().unwrap();
+        device.id = id.to_owned();
+    }
 
     Ok(Json(ListResponse { devices }))
 }

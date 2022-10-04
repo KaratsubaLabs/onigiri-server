@@ -837,6 +837,7 @@ dependencies = [
  "onigiri_types",
  "reqwest",
  "thiserror",
+ "tokio",
 ]
 
 [[package]]
