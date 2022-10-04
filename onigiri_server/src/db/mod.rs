@@ -2,7 +2,7 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use log::{debug, info};
-use onigiri_types::db::Device;
+use onigiri_types::db::{ApiType, Device};
 use reqwest::Client;
 use rocket::http::Status;
 use serde::{de::DeserializeOwned, ser};
@@ -103,11 +103,17 @@ impl DB {
         Ok(())
     }
 
-    pub async fn create_device(&self, name: &str, ip_address: Ipv4Addr) -> Result<()> {
+    pub async fn create_device(
+        &self,
+        name: &str,
+        ip_address: Ipv4Addr,
+        api_type: ApiType,
+    ) -> Result<()> {
         self.query(&format!(
-            r#"CREATE devices SET name="{0}", ip_address="{1}";"#,
+            r#"CREATE devices SET name="{0}", ip_address="{1}", api_type="{2}";"#,
             name,
-            ip_address.to_string()
+            ip_address.to_string(),
+            api_type.to_string(),
         ))
         .await?;
         Ok(())

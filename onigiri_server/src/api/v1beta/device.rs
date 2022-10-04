@@ -29,7 +29,7 @@ pub(crate) async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Sta
         }
     }
 
-    db().create_device(body.name, body.ip_address)
+    db().create_device(body.name, body.ip_address, body.api_type)
         .await
         .map_err(|f| Status::InternalServerError)?;
 
