@@ -37,7 +37,7 @@ impl Client {
     }
 
     /// Claim a device to use
-    pub async fn device<D: Device>(&self, device_id: &str) -> anyhow::Result<Box<D>> {
+    pub async fn device<D: Device>(&self, device_id: &str) -> anyhow::Result<D> {
         // check the type of the device
         // TODO not super efficient fetchign ALL the devices
         let devices = self.get_devices().await?;
@@ -60,6 +60,6 @@ impl Client {
         }
 
         let device = D::new(&self.api_url, device_id)?;
-        Ok(device)
+        Ok(*device)
     }
 }
