@@ -1,3 +1,8 @@
+// Resources that were used in writing this
+// - [periodic interuptable task](https://stackoverflow.com/questions/71096626/how-do-i-run-an-asynchronous-task-periodically-and-also-sometimes-on-demand)
+// - [function types
+// explained](https://medium.com/swlh/understanding-closures-in-rust-21f286ed1759) 
+
 use std::time::Duration;
 
 use tokio::{task::JoinHandle, time::sleep};
