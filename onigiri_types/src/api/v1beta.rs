@@ -18,3 +18,16 @@ pub mod device {
         pub devices: Vec<Device>,
     }
 }
+
+pub mod auth {
+
+    use serde::{Deserialize, Serialize};
+
+    /*
+    #[derive(Serialize, Deserialize)]
+    pub struct RegisterBody<'r> {
+        username: &'r str,
+        password: &'r str,
+    }
+    */
+}

@@ -2,12 +2,14 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use log::{debug, info};
-use onigiri_types::db::{ApiType, Device};
+use onigiri_types::db::{ApiKey, ApiType, Device};
 use reqwest::Client;
 use rocket::http::Status;
 use serde::{de::DeserializeOwned, ser};
 use serde_json::Value;
 use thiserror::Error;
+
+use crate::utils::apikey::generate_apikey;
 
 #[derive(Error, Debug)]
 pub enum DBError {
@@ -143,6 +145,29 @@ impl DB {
     pub async fn query_devices(&self) -> Result<Vec<Device>> {
         self.query_typed::<Vec<Device>>(&format!(r#"SELECT * FROM devices;"#,))
             .await
+    }
+
+    pub async fn create_apikey(&self) -> Result<()> {
+        // generate an apikey string
+        let apikey = generate_apikey();
+
+        // TODO maybe hash the apikey when storing in DB
+        self.query(&format!(r#"CREATE apikeys:{0}"#, apikey))
+            .await?;
+        Ok(())
+    }
+
+    /// The api key is the id
+    pub async fn query_apikey_by_id(&self, id: &str) -> Result<ApiKey> {
+        let mut res = self
+            .query_typed::<Vec<ApiKey>>(&format!(r#"SELECT * FROM apikeys:{0}"#, id))
+            .await?;
+
+        if res.is_empty() {
+            Err(DBError::NoRecords)
+        } else {
+            Ok(res.remove(0))
+        }
     }
 }
 

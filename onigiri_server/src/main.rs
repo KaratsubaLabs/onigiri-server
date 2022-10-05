@@ -3,6 +3,7 @@
 
 mod api;
 mod db;
+mod utils;
 
 #[macro_use]
 extern crate rocket;

@@ -11,8 +11,9 @@ fn health() -> Status {
 pub fn routes() -> Vec<Route> {
     routes![
         health,
-        auth::register,
-        auth::login,
+        // auth::register,
+        // auth::login,
+        auth::create_apikey,
         device::register,
         device::list,
         device::control_get,
