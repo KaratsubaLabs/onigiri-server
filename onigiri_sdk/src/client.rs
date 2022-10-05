@@ -86,7 +86,7 @@ mod tests {
     #[tokio::test]
     async fn lcd_device() -> anyhow::Result<()> {
         let api_url = "http://127.0.0.1:8080/v1beta";
-        let client = Client::connect(api_url)?;
+        let client = Client::connect(api_url, "API_KEY")?;
 
         let devices = client.get_devices().await?;
 

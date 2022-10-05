@@ -1,5 +1,7 @@
 use rocket::{http::Status, Route};
 
+use crate::api::guards::ApiKeyGuard;
+
 pub mod auth;
 pub mod device;
 

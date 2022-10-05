@@ -116,14 +116,22 @@ mod tests {
     use std::net::Ipv4Addr;
 
     use onigiri_types::{api::v1beta::device::*, db::ApiType};
-    use rocket::{http::Status, local::blocking::Client};
+    use rocket::{
+        http::{Header, Status},
+        local::blocking::Client,
+    };
 
     use crate::app;
+
+    // NOTE run tests with `debug feature`, since we need to use the hardcoded valid API key
 
     #[test]
     fn control_get() {
         let client = Client::tracked(app()).unwrap();
-        let mut res = client.get("/v1beta/device/0/random").dispatch();
+        let mut res = client
+            .get("/v1beta/device/0/random")
+            .header(Header::new("X-API-KEY", "API_KEY"))
+            .dispatch();
     }
 
     #[test]
@@ -136,12 +144,19 @@ mod tests {
                 ip_address: Ipv4Addr::new(127, 0, 0, 1),
                 api_type: ApiType::LCD,
             })
+            .header(Header::new("X-API-KEY", "API_KEY"))
             .dispatch();
+
+        assert_eq!(res.status().code, 200);
     }
 
     #[test]
     fn list_devices() {
         let client = Client::tracked(app()).unwrap();
-        let mut res = client.get("/v1beta/device/").dispatch();
+        let mut res = client
+            .get("/v1beta/device/")
+            .header(Header::new("X-API-KEY", "API_KEY"))
+            .dispatch();
+        assert_eq!(res.status().code, 200);
     }
 }
