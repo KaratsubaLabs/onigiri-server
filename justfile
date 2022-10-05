@@ -2,6 +2,9 @@
 default: debug
 
 debug:
+    RUST_LOG=onigiri_server=debug,info cargo run --features=debug
+
+run:
     RUST_LOG=onigiri_server=debug,info cargo run
 
 devsetup:

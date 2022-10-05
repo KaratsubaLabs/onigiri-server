@@ -12,6 +12,9 @@ extern crate rocket;
 async fn main() -> Result<(), rocket::Error> {
     env_logger::builder().init();
 
+    #[cfg(feature = "debug")]
+    log::warn!("Debug mode is enabled, security is loosened.");
+
     log::info!("Starting server...");
 
     app().launch().await?;

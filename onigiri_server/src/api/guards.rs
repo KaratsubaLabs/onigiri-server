@@ -20,6 +20,12 @@ impl<'r> FromRequest<'r> for ApiKeyGuard {
             return Outcome::Failure((Status::Unauthorized, anyhow!("no api key found")));
         };
 
+        // use a hardcoded valid API key for testing purposes
+        #[cfg(feature = "debug")]
+        if api_key == "API_KEY" {
+            return Outcome::Success(ApiKeyGuard);
+        }
+
         if db().query_apikey_by_id(api_key).await.is_err() {
             return Outcome::Failure((Status::Unauthorized, anyhow!("invalid api key")));
         }
