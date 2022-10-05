@@ -3,6 +3,7 @@
 
 mod api;
 mod db;
+mod utils;
 
 #[macro_use]
 extern crate rocket;
@@ -10,6 +11,9 @@ extern crate rocket;
 #[rocket::main]
 async fn main() -> Result<(), rocket::Error> {
     env_logger::builder().init();
+
+    #[cfg(feature = "debug")]
+    log::warn!("Debug mode is enabled, security is loosened.");
 
     log::info!("Starting server...");
 

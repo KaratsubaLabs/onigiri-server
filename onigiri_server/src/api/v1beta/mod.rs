@@ -1,5 +1,7 @@
 use rocket::{http::Status, Route};
 
+use crate::api::guards::ApiKeyGuard;
+
 pub mod auth;
 pub mod device;
 
@@ -11,8 +13,9 @@ fn health() -> Status {
 pub fn routes() -> Vec<Route> {
     routes![
         health,
-        auth::register,
-        auth::login,
+        // auth::register,
+        // auth::login,
+        auth::create_apikey,
         device::register,
         device::list,
         device::control_get,

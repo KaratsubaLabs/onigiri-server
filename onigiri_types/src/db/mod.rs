@@ -19,6 +19,11 @@ pub struct Device {
     // pub api_type: ApiType,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ApiKey {
+    pub id: String,
+}
+
 pub struct User {
     pub username: String,
     pub hashed_password: String,
