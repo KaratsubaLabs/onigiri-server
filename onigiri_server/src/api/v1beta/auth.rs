@@ -21,3 +21,14 @@ pub(crate) async fn create_apikey() -> Result<Status, Status> {
         .map_err(|f| Status::InternalServerError)?;
     Ok(Status::Ok)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::create_apikey;
+
+    #[tokio::test]
+    async fn create() {
+        let res = create_apikey().await;
+        assert!(res.is_ok());
+    }
+}
