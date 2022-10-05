@@ -13,7 +13,7 @@ use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::db::db;
+use crate::{db::db, api::guards::ApiKeyGuard};
 
 /// [Device Facing] A device can ping this endpoint to register themselves
 // TODO device facing endpoints maybe should be under a different path?
@@ -45,7 +45,7 @@ pub(crate) async fn unregister(device_id: PathBuf) {
 
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
-pub(crate) async fn list() -> Result<Json<ListResponse>, Status> {
+pub(crate) async fn list(api_key: ApiKeyGuard) -> Result<Json<ListResponse>, Status> {
     let mut devices = db()
         .query_devices()
         .await
@@ -66,7 +66,7 @@ pub(crate) async fn list() -> Result<Json<ListResponse>, Status> {
 
 /// [User Facing] Proxies get request to corresponding device
 #[get("/device/<device_id>/<rest..>")]
-pub(crate) async fn control_get(device_id: PathBuf, rest: PathBuf) -> Result<Status, Status> {
+pub(crate) async fn control_get(device_id: PathBuf, rest: PathBuf, api_key: ApiKeyGuard) -> Result<Status, Status> {
     // look up device ip
     let id = device_id.to_str().unwrap_or_default();
     // TODO not all errors are 404
@@ -90,6 +90,7 @@ pub(crate) async fn control_post(
     device_id: PathBuf,
     rest: PathBuf,
     body: String,
+    api_key: ApiKeyGuard
 ) -> Result<Status, Status> {
     let id = device_id.to_str().unwrap_or_default();
     // TODO not all errors are 404

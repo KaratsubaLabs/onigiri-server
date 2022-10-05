@@ -6,6 +6,8 @@ use thiserror::Error;
 
 use crate::api::Device;
 
+pub const API_KEY_HEADER: &'static str = "X-API-KEY";
+
 #[derive(Error, Debug)]
 pub enum Error {
     #[error("Could not connect to server")]
@@ -16,14 +18,16 @@ pub enum Error {
 
 pub struct Client {
     pub api_url: String,
+    pub api_key: String,
 }
 
 impl Client {
     /// Attempt to connect to the server
-    pub fn connect(api_url: &str) -> Result<Client, Error> {
+    pub fn connect(api_url: &str, api_key: &str) -> Result<Client, Error> {
         // TODO auth
         Ok(Client {
             api_url: api_url.to_owned(),
+            api_key: api_key.to_owned(),
         })
     }
 
@@ -31,6 +35,7 @@ impl Client {
     pub async fn get_devices(&self) -> anyhow::Result<Vec<db::Device>> {
         let res = reqwest::Client::new()
             .get(format!("{}/device", self.api_url))
+            .header(API_KEY_HEADER, self.api_key.clone())
             .send()
             .await?;
 
@@ -55,6 +60,7 @@ impl Client {
         // check health of device
         let res = reqwest::Client::new()
             .get(format!("{}/device/{}/health", self.api_url, device_id))
+            .header(API_KEY_HEADER, self.api_key.clone())
             .send()
             .await?;
 
@@ -62,7 +68,7 @@ impl Client {
             // TODO error handle
         }
 
-        let device = D::new(&self.api_url, device_id)?;
+        let device = D::new(&self.api_url, &self.api_key, device_id)?;
         Ok(*device)
     }
 }

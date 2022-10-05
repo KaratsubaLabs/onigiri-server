@@ -11,9 +11,9 @@ use crate::db::db;
 pub struct ApiKeyGuard;
 
 #[rocket::async_trait]
-impl<'a, 'r> FromRequest<'a, 'r> for ApiKeyGuard {
+impl<'r> FromRequest<'r> for ApiKeyGuard {
     type Error = anyhow::Error;
-    async fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
+    async fn from_request(request: &'r Request<'_>) -> Outcome<Self, Self::Error> {
         let api_key = if let Some(api_key) = request.headers().get_one("X-API-KEY") {
             api_key
         } else {
@@ -23,6 +23,8 @@ impl<'a, 'r> FromRequest<'a, 'r> for ApiKeyGuard {
         if db().query_apikey_by_id(api_key).await.is_err() {
             return Outcome::Failure((Status::Unauthorized, anyhow!("invalid api key")));
         }
+
+        // TODO delete header after (not sure if theres a need)
 
         Outcome::Success(ApiKeyGuard)
     }
