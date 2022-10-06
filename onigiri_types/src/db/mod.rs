@@ -6,6 +6,7 @@ use serde::{Deserialize, Serialize};
 pub enum ApiType {
     LCD,
     LED,
+    LIGHT,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
