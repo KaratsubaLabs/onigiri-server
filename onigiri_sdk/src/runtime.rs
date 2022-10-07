@@ -81,7 +81,19 @@ impl App {
         Ok(())
     }
 
-    // pub fn run_once() {}
+    /// Run a system only once
+    pub async fn run_once<F>(&self, system: F) -> Result<(), anyhow::Error>
+    where
+        F: System + 'static,
+    {
+        let client = self.client_builder.connect()?;
+        let handle: JoinHandle<()> = tokio::spawn(async move {
+            system.run(client.clone()).await;
+        });
+        handle.await;
+
+        Ok(())
+    }
 
     // /// Create a system that runs over an interval and also can be interupted to restart
     // pub fn add_periodic_interuptable_system(&mut self) {}

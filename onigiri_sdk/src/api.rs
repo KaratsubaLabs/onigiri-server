@@ -82,7 +82,6 @@ pub struct LightDevice {
 }
 
 impl LightDevice {
-
     pub async fn light_on(&self) -> reqwest::Result<Response> {
         Client::new()
             .post(format!(
@@ -112,12 +111,12 @@ impl LightDevice {
 impl Device for LightDevice {
     const API_TYPE: ApiType = ApiType::LIGHT;
 
-    fn new(api_url: &str, api_key: &str, id: &str) -> anyhow::Result<Box<Self>> {
-        Ok(Box::new(LightDevice {
+    fn new(api_url: &str, api_key: &str, id: &str) -> Box<Self> {
+        Box::new(LightDevice {
             api_url: api_url.to_owned(),
             api_key: api_key.to_owned(),
             id: id.to_owned(),
-        }))
+        })
     }
 
     fn get_id(&self) -> &str {
@@ -131,5 +130,4 @@ impl Device for LightDevice {
     fn get_api_key(&self) -> &str {
         &self.api_key
     }
-    
 }
