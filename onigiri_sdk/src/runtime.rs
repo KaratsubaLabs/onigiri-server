@@ -11,7 +11,7 @@ use tokio::{task::JoinHandle, time::sleep};
 use crate::client::{Client, ClientBuilder};
 
 #[async_trait]
-pub trait System: Send + Sync {
+pub trait System: Send + Sync + 'static {
     type Output;
 
     async fn run(&self, client: Client) -> Self::Output;
@@ -20,7 +20,7 @@ pub trait System: Send + Sync {
 #[async_trait]
 impl<F, R> System for F
 where
-    F: Fn(Client) -> R + Send + Sync,
+    F: Fn(Client) -> R + Send + Sync + 'static,
     R: Future + Send,
 {
     type Output = <R as Future>::Output;
@@ -61,14 +61,11 @@ impl App {
     */
 
     /// Create a system that will run over an interval
-    pub fn add_periodic_system<F>(
+    pub fn add_periodic_system<S: System>(
         &mut self,
-        system: F,
+        system: S,
         duration: Duration,
-    ) -> Result<(), anyhow::Error>
-    where
-        F: System + 'static,
-    {
+    ) -> Result<(), anyhow::Error> {
         let client = self.client_builder.connect()?;
         let handle: JoinHandle<()> = tokio::spawn(async move {
             loop {
@@ -82,15 +79,12 @@ impl App {
     }
 
     /// Run a system only once
-    pub async fn run_once<F>(&self, system: F) -> Result<(), anyhow::Error>
-    where
-        F: System + 'static,
-    {
+    pub async fn run_once<S: System>(&self, system: S) -> Result<(), anyhow::Error> {
         let client = self.client_builder.connect()?;
         let handle: JoinHandle<()> = tokio::spawn(async move {
             system.run(client.clone()).await;
         });
-        handle.await;
+        handle.await?;
 
         Ok(())
     }
