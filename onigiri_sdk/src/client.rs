@@ -16,21 +16,39 @@ pub enum Error {
     DeviceNotFound(String),
 }
 
+#[derive(Clone)]
+pub struct ClientBuilder {
+    api_url: String,
+    api_key: String,
+}
+
+impl ClientBuilder {
+    /// Attempt to connect to the server
+    pub fn new(api_url: &str, api_key: &str) -> ClientBuilder {
+        // TODO auth
+        ClientBuilder {
+            api_url: api_url.to_owned(),
+            api_key: api_key.to_owned(),
+        }
+    }
+
+    /// Attempt to connect to the server
+    pub fn connect(&self) -> Result<Client, Error> {
+        // TODO auth
+        Ok(Client {
+            api_url: self.api_url.to_owned(),
+            api_key: self.api_key.to_owned(),
+        })
+    }
+}
+
+#[derive(Clone)]
 pub struct Client {
-    pub api_url: String,
-    pub api_key: String,
+    api_url: String,
+    api_key: String,
 }
 
 impl Client {
-    /// Attempt to connect to the server
-    pub fn connect(api_url: &str, api_key: &str) -> Result<Client, Error> {
-        // TODO auth
-        Ok(Client {
-            api_url: api_url.to_owned(),
-            api_key: api_key.to_owned(),
-        })
-    }
-
     /// Get list of all devices that can be claimed
     pub async fn get_devices(&self) -> anyhow::Result<Vec<db::Device>> {
         let res = reqwest::Client::new()
@@ -78,7 +96,7 @@ mod tests {
 
     use onigiri_types::db::ApiType;
 
-    use super::Client;
+    use super::{Client, ClientBuilder};
     use crate::api::LCDDevice;
 
     /// This test requires a running onigiri-server instance, with a registered lcd device (it's
@@ -86,7 +104,7 @@ mod tests {
     #[tokio::test]
     async fn lcd_device() -> anyhow::Result<()> {
         let api_url = "http://127.0.0.1:8080/v1beta";
-        let client = Client::connect(api_url, "API_KEY")?;
+        let client = ClientBuilder::new(api_url, "API_KEY").connect()?;
 
         let devices = client.get_devices().await?;
 
