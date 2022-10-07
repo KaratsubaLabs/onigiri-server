@@ -3,25 +3,29 @@
 // - [function types
 // explained](https://medium.com/swlh/understanding-closures-in-rust-21f286ed1759)
 
-use std::time::Duration;
+use std::{future::Future, time::Duration};
 
+use async_trait::async_trait;
 use tokio::{task::JoinHandle, time::sleep};
 
 use crate::client::{Client, ClientBuilder};
 
-pub trait System: Send {
+#[async_trait]
+pub trait System: Send + Sync {
     type Output;
 
-    fn run(&self, client: Client) -> Self::Output;
+    async fn run(&self, client: Client) -> Self::Output;
 }
 
+#[async_trait]
 impl<F, R> System for F
 where
-    F: Fn(Client) -> R + Send,
+    F: Fn(Client) -> R + Send + Sync,
+    R: Future + Send,
 {
-    type Output = R;
-    fn run(&self, client: Client) -> Self::Output {
-        self(client)
+    type Output = <R as Future>::Output;
+    async fn run(&self, client: Client) -> Self::Output {
+        self(client).await
     }
 }
 
@@ -38,6 +42,7 @@ impl App {
         }
     }
 
+    /*
     /// Create a system that will infinitely loop
     pub fn add_system<F>(&mut self, system: F) -> Result<(), anyhow::Error>
     where
@@ -53,6 +58,7 @@ impl App {
         self.handles.push(handle);
         Ok(())
     }
+    */
 
     /// Create a system that will run over an interval
     pub fn add_periodic_system<F>(
@@ -66,7 +72,7 @@ impl App {
         let client = self.client_builder.connect()?;
         let handle: JoinHandle<()> = tokio::spawn(async move {
             loop {
-                system.run(client.clone());
+                system.run(client.clone()).await;
                 sleep(duration).await;
             }
         });
@@ -74,6 +80,8 @@ impl App {
         self.handles.push(handle);
         Ok(())
     }
+
+    // pub fn run_once() {}
 
     // /// Create a system that runs over an interval and also can be interupted to restart
     // pub fn add_periodic_interuptable_system(&mut self) {}
@@ -88,17 +96,31 @@ mod tests {
     use tokio::time::sleep;
 
     use super::App;
-    use crate::client::{Client, ClientBuilder};
+    use crate::{
+        api::LCDDevice,
+        client::{Client, ClientBuilder},
+    };
+
+    async fn sys(client: Client) {
+        println!("hello world");
+
+        let lcd = client
+            .device::<LCDDevice>("rf4smke9g4gwz4eajj9o")
+            .await
+            .expect("could not find device");
+        let res = lcd
+            .write_line(1, "hello world")
+            .await
+            .expect("error interfacing with device");
+        println!("{:?}", res);
+    }
 
     #[tokio::test]
     async fn periodic() {
-        let sys = |client: Client| {
-            println!("hello world");
-        };
-
         let client = ClientBuilder::new("http://127.0.0.1:8080/v1beta", "API_KEY");
         let mut app = App::new(client);
-        app.add_periodic_system(sys, Duration::from_secs(1));
+        app.add_periodic_system(sys, Duration::from_secs(1))
+            .unwrap();
 
         sleep(Duration::from_secs(5)).await;
     }

@@ -86,8 +86,14 @@ impl Client {
             // TODO error handle
         }
 
-        let device = D::new(&self.api_url, &self.api_key, device_id)?;
+        let device = D::new(&self.api_url, &self.api_key, device_id);
         Ok(*device)
+    }
+
+    /// Claim device to use without checking that the it is a valid device
+    pub fn device_unchecked<D: Device>(&self, device_id: &str) -> D {
+        let device = D::new(&self.api_url, &self.api_key, device_id);
+        *device
     }
 }
 
