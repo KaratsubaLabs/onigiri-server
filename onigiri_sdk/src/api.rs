@@ -7,7 +7,7 @@ use crate::client::API_KEY_HEADER;
 
 pub trait Device {
     const API_TYPE: ApiType;
-    fn new(api_url: &str, api_key: &str, id: &str) -> anyhow::Result<Box<Self>>;
+    fn new(api_url: &str, api_key: &str, id: &str) -> Box<Self>;
     fn get_api_url(&self) -> &str;
     fn get_api_key(&self) -> &str;
     fn get_id(&self) -> &str;
@@ -50,12 +50,12 @@ impl LCDDevice {
 impl Device for LCDDevice {
     const API_TYPE: ApiType = ApiType::LCD;
 
-    fn new(api_url: &str, api_key: &str, id: &str) -> anyhow::Result<Box<Self>> {
-        Ok(Box::new(LCDDevice {
+    fn new(api_url: &str, api_key: &str, id: &str) -> Box<Self> {
+        Box::new(LCDDevice {
             api_url: api_url.to_owned(),
             api_key: api_key.to_owned(),
             id: id.to_owned(),
-        }))
+        })
     }
 
     fn get_id(&self) -> &str {
