@@ -1,0 +1,216 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Onigiri Home Automation System</title>
+        <meta name="robots" content="noindex" />
+        <!-- Custom HTML head -->
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="Developer documentation for project onigiri">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Introduction</a></li><li class="chapter-item expanded "><a href="arch/index.html"><strong aria-hidden="true">1.</strong> Project Overview</a></li><li class="chapter-item expanded "><a href="sdk/index.html"><strong aria-hidden="true">2.</strong> SDK Documentation</a></li><li class="chapter-item expanded "><a href="device/index.html"><strong aria-hidden="true">3.</strong> Device Documentation</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Onigiri Home Automation System</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 align="center">Introduction</h1>
+<hr>
+<p><strong>KaratsubaLabs Project Onigiri</strong> is intended to be a highly scriptable and
+modular home automation system. It provides a central server to manage home automation devices (such as sensors, motors, lcd displays) as well as a scripting API to interact with these devices.</p>
+<p>The goal of this project is to provide a way for people to build their own home automation systems in a code-centric way. <strong>Onigiri</strong> is the glue that joins your devices and your scripts. This means that <strong>Onigiri</strong> is very easy to extend, configure, and integrate into other existing systems. Take note that if you want a home automation system working out of the box, this is not for you.</p>
+<h2 id="features"><a class="header" href="#features">Features</a></h2>
+<p><strong>Onigiri</strong> comes bundled with a <a href="https://github.com/KaratsubaLabs/onigiri-server/tree/master/onigiri_sdk">rust sdk</a> to facilitate scripting behaviors for these devices. It is completely possible to create an sdk for other languages using the scripting API, but only rust is supported for now.</p>
+<p>The main device that is targeted is the ESP8266, although any device that can understand REST will be compatible. <strong>Onigiri</strong> has some prebuilt controller software that can be found <a href="https://github.com/KaratsubaLabs/onigiri-firmware">here</a>. You are of course highly encouraged to write your own.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 align="center">Project Overview</h1>
+<hr>
+<p>This section will provide a description of each component of <strong>Project Onigiri</strong>. This will help you create your mental model of what this project is and is not, and where your own code fits into the entire system.</p>
+<h2 id="devices"><a class="header" href="#devices">Devices</a></h2>
+<p>Firstly, we have the <em>devices</em>. These are the actual IOT 'gadgets' that you will have around your home, things like smart switches, window blind controllers, and lcd displays. These <em>devices</em> will have a REST API to interact with them. For now, these <em>devices</em> are all composed of an ESP8266 (a wifi enabled microcontroller), theoretically any wifi enabled board will work. While <strong>Project Onigiri</strong> provides some existing web server + controller software (avaliable in the <a href="https://github.com/KaratsubaLabs/onigiri-firmware">onigiri-firmware repo</a>), you should be writing custom controller software for your own need.</p>
+<p>Please refer to the dedicated chapter <a href="arch/index.html#">Device Documentation</a> for writing your own controller code.</p>
+<h2 id="server"><a class="header" href="#server">Server</a></h2>
+<p>The <em>server</em> provides an abstraction layer over the <em>devices</em>. It acts as a proxy between the user application and each <em>device</em>.</p>
+<p>The process to register a <em>device</em> is as follows:</p>
+<ul>
+<li><em>device</em> boots up</li>
+<li>pings <em>server</em> to register itself (make itself known to the <em>server</em>)</li>
+<li><em>server</em> records <em>device</em> details (like friendly name, API type, IP address)</li>
+<li>user application claim devices using their friendly name</li>
+</ul>
+<p>The process for a user sending an action to a <em>device</em> is as follows:</p>
+<ul>
+<li>user (or sdk) makes REST call to <em>server</em></li>
+<li><em>server</em> checks credentials</li>
+<li><em>server</em> fetches <em>device</em> IP address</li>
+<li>user's REST call is proxied to the corresponding <em>device</em></li>
+<li><em>device</em> handles request</li>
+</ul>
+<h2 id="user-application"><a class="header" href="#user-application">User Application</a></h2>
+<p>The user application is entirely your code. You make use of the rust sdk or straight up using the scripting API endpoints, to script the behavior of the <em>devices</em>. This is where you would define behaviors like</p>
+<ul>
+<li>Open the blinds and turn on the lights at 9 am if it is a weekday</li>
+<li>If the door gets opened and it is past midnight, trigger an intruder alert</li>
+<li>Using a cli, turn on the coffee machine</li>
+<li>Connect with smart watch so that if you press a button on the smart watch, the lights turn on</li>
+</ul>
+<p>The sdk not only wraps the scripting API calls into nice handler functions and types, it provides a 'runtime' of sorts to write common behaviors like periodic actions and event listeners. For more information, checkout the <a href="arch/index.html#">SDK Documentation</a> section.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 align="center">SDK Documentation</h1>
+<hr>
+<p>This section outline how to use the rust SDK.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 align="center">Device Documentation</h1>
+<hr>
+<p>This section will provide you information on how to write your <strong>Onigiri</strong> compatible controller software for <em>devices</em>.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+            </nav>
+
+        </div>
+
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+    </body>
+</html>
