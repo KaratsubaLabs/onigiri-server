@@ -2,7 +2,7 @@
 use std::net::{IpAddr, Ipv4Addr};
 
 use log::{debug, info};
-use onigiri_types::db::{ApiKey, ApiType, Device};
+use onigiri_types::db::{ApiKey, ApiType, Device, ApiKeyRole};
 use reqwest::Client;
 use rocket::http::Status;
 use serde::{de::DeserializeOwned, ser};
@@ -147,12 +147,12 @@ impl DB {
             .await
     }
 
-    pub async fn create_apikey(&self) -> Result<()> {
+    pub async fn create_apikey(&self, role: ApiKeyRole) -> Result<()> {
         // generate an apikey string
         let apikey = generate_apikey();
 
         // TODO maybe hash the apikey when storing in DB
-        self.query(&format!(r#"CREATE apikeys:{0}"#, apikey))
+        self.query(&format!(r#"CREATE apikeys:{0} SET role={1}"#, apikey, role))
             .await?;
         Ok(())
     }

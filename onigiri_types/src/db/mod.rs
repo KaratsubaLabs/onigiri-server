@@ -23,6 +23,14 @@ pub struct Device {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ApiKey {
     pub id: String,
+    pub role: ApiKeyRole,
+}
+
+#[enum_string]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone, Copy)]
+pub enum ApiKeyRole {
+    User,
+    Device
 }
 
 pub struct User {

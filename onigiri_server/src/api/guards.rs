@@ -4,6 +4,7 @@ use rocket::{
     request::{FromRequest, Outcome},
     Request,
 };
+use onigiri_types::db::ApiKeyRole;
 
 use crate::db::db;
 
