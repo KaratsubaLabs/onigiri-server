@@ -32,3 +32,10 @@ An instance of surrealdb needs to be up. You can run it as a docker container
 $ docker run --rm -p 8000:8000 surrealdb/surrealdb:latest start --log debug --user <USERNAME> --pass <PASSWORD> memory
 ```
 
+## READING DOCUMENTATION
+
+Documentation on **project onigiri** can be read locally with the command
+```
+$ just book
+```
+or read online [here](https://karatsubalabs.github.io/onigiri-server/index.html).
