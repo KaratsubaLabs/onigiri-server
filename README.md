@@ -4,6 +4,10 @@
 
 device and user management API for **project onigiri**
 
+[![book](https://img.shields.io/badge/book-website-orange)](https://karatsubalabs.github.io/onigiri-server/)
+[![build](https://github.com/KaratsubaLabs/onigiri-server/workflows/Deploy/badge.svg)](https://github.com/KaratsubaLabs/onigiri-server/actions)
+[![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](#)
+
 </div>
 
 ## SETTING UP FOR DEVELOPMENT
