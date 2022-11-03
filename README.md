@@ -14,6 +14,11 @@ Some features of the nightly build of `rustfmt` are required for
 $ rustup install nightly
 ```
 
+There are some other tools that should be installed to make development easier:
+```
+$ cargo install cargo-watch
+```
+
 Next, install the git hook that will automatically format and lint your code on
 commit with:
 ```
