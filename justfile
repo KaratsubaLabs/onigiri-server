@@ -10,6 +10,9 @@ run:
 devsetup:
     cp dev/hooks/* .git/hooks
 
+book:
+    mdbook serve book
+
 fmt:
     cargo +nightly fmt --all
 
