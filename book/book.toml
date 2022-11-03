@@ -1,0 +1,10 @@
+[book]
+authors = ["Daniel Liu"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Onigiri Home Automation System"
+description = "Developer documentation for project onigiri"
+
+[rust]
+edition = "2021"
