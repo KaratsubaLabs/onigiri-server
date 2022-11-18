@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  server:
+    container_name: onigiri-server
+    depends_on:
+      - database
+    build: ./
+    ports:
+      - 8080:8080
+    restart: always
+  database:
+    container_name: onigiri-database
+    image: surrealdb/surrealdb:latest
+    ports:
+      - 8000:8000
+    volumes:
+      - database-data:/data
+    command: start --log debug --user <USERNAME> --pass <PASSWORD> memory
+    restart: always
+volumes:
+  database-data: {}
+
