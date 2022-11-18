@@ -1,4 +1,4 @@
-FROM rust:slim-buster
+FROM rust:latest
 
 RUN USER=root cargo new --bin onigiri_server
 WORKDIR onigiri_server
