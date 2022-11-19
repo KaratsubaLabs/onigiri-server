@@ -835,7 +835,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "onigiri_types",
+ "onigiri_types 0.1.0",
  "reqwest",
  "thiserror",
  "tokio",
@@ -848,7 +848,7 @@ dependencies = [
  "anyhow",
  "env_logger",
  "log",
- "onigiri_types",
+ "onigiri_types 0.1.0 (git+https://github.com/KaratsubaLabs/onigiri-server)",
  "reqwest",
  "rocket",
  "serde",
@@ -861,6 +861,17 @@ dependencies = [
 [[package]]
 name = "onigiri_types"
 version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "pino_utils",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "onigiri_types"
+version = "0.1.0"
+source = "git+https://github.com/KaratsubaLabs/onigiri-server#8b7424c151013dd320260ac0f6111d9607ad529e"
 dependencies = [
  "anyhow",
  "pino_utils",

@@ -19,7 +19,7 @@ uuid = { version = "1.1", features = ["v5"] }
 log = { version = "0.4" }
 env_logger = { version = "0.9" }
 
-onigiri_types = { path = "../onigiri_types" }
+onigiri_types = { git = "https://github.com/KaratsubaLabs/onigiri-server" }
 
 [features]
 debug = []
