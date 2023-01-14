@@ -23,7 +23,7 @@ pub fn routes() -> Vec<Route> {
         device::list,
         device::control_get,
         device::control_post,
-        // device::client_event_listen,
-        // device::client_event_push,
+        device::client_event_listen,
+        device::client_event_push,
     ]
 }

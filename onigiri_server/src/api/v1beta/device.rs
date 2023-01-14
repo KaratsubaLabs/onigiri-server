@@ -20,7 +20,11 @@ use rocket::{
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::{api::guards::ApiKeyGuard, db::db, utils::state::DevPipe};
+use crate::{
+    api::guards::ApiKeyGuard,
+    db::db,
+    utils::state::{ClientPipe, DevPipe},
+};
 
 /// [Device Facing] A device can ping this endpoint to register themselves
 // TODO device facing endpoints maybe should be under a different path?
@@ -180,18 +184,19 @@ pub(crate) async fn event_push(
     Ok(Status::Ok)
 }
 
-/*
+// TODO hack for device to broadcast to all clients
+const CLIENT_BROADCAST_ID: &'static str = "all";
+
 /// [Client Facing] Register itself to listen for events
-#[get("/device/client")]
+#[get("/client/device")]
 pub(crate) fn client_event_listen<'a>(
     client_pipe: &'a State<ClientPipe>,
     api_key: ApiKeyGuard,
 ) -> EventStream![Event + '_] {
-
     EventStream! (
         let mut interval = time::interval(Duration::from_secs(1));
         loop {
-        for e in client_pipe.read_all(&id) {
+        for e in client_pipe.read_all(CLIENT_BROADCAST_ID) {
         yield Event::data(e);
         }
             interval.tick().await;
@@ -201,17 +206,15 @@ pub(crate) fn client_event_listen<'a>(
 
 /// [DeviceFacing] Proxies post request to corresponding client event mode
 // TODO currently broadcases to all clients
-#[post("/device/client", data = "<body>")]
-pub(crate) async fn event_push(
+#[post("/client/device", data = "<body>")]
+pub(crate) async fn client_event_push(
     body: String,
     client_pipes: &State<ClientPipe>,
 ) -> Result<Status, Status> {
-
-    client_pipes.send(id, &body);
+    client_pipes.send(CLIENT_BROADCAST_ID, &body);
 
     Ok(Status::Ok)
 }
-*/
 
 #[cfg(test)]
 mod tests {
