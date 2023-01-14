@@ -21,6 +21,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: "{{defaultContext}}/onigiri_server"
+          context: "./onigiri_server"
           push: true
-          tags: user/app:latest
+          tags: pinosaur/app:latest
