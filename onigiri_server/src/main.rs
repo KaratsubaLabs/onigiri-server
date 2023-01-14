@@ -1,6 +1,8 @@
 #![allow(unused)]
 #![allow(dead_code)]
 
+use utils::state::{ClientPipe, DevPipe};
+
 mod api;
 mod db;
 mod utils;
@@ -24,6 +26,8 @@ async fn main() -> Result<(), rocket::Error> {
 
 fn app() -> rocket::Rocket<rocket::Build> {
     rocket::build()
+        .manage(DevPipe::default())
+        .manage(ClientPipe::default())
         .register("/", api::handlers::catchers())
         .mount("/v1beta", api::v1beta::routes())
 }

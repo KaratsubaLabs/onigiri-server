@@ -15,18 +15,42 @@ use rocket::{
     response::stream::{Event, EventStream},
     serde::json::Json,
     tokio::time::{self, Duration},
+    State,
 };
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
-use crate::{api::guards::ApiKeyGuard, db::db};
+use crate::{api::guards::ApiKeyGuard, db::db, utils::state::DevPipe};
 
 #[get("/device/event_test")]
-pub(crate) async fn event_test() -> EventStream![] {
+pub(crate) async fn event_test(dev_pipe: &State<DevPipe>) -> EventStream![] {
     EventStream! (
         let mut interval = time::interval(Duration::from_secs(1));
         loop {
-            yield Event::data("ping");
+        yield Event::data("ping");
+            interval.tick().await;
+        }
+    )
+}
+
+/// [Device Facing] Register itself to listen for events
+// TEMP devices specify their own id
+#[get("/device/listen/<device_id>")]
+pub(crate) fn event_listen<'a>(
+    device_id: PathBuf,
+    dev_pipe: &'a State<DevPipe>,
+) -> EventStream![Event + '_] {
+    // retrieve device id
+    let id = device_id.to_str().unwrap_or_default().to_string();
+
+    // register self with device identity into connection pool
+
+    EventStream! (
+        let mut interval = time::interval(Duration::from_secs(1));
+        loop {
+        for e in dev_pipe.read_all(&id) {
+        yield Event::data(e);
+        }
             interval.tick().await;
         }
     )
@@ -126,6 +150,27 @@ pub(crate) async fn control_post(
 
     println!("{:?}", device_res);
     Ok(Status::new(device_res.status().as_u16()))
+}
+
+/// [User Facing] Proxies post request to corresponding device event mode
+#[post("/device/event/<device_id>", data = "<body>")]
+pub(crate) async fn event_push(
+    device_id: PathBuf,
+    body: String,
+    api_key: ApiKeyGuard,
+    dev_pipes: &State<DevPipe>,
+) -> Result<Status, Status> {
+    let id = device_id.to_str().unwrap_or_default();
+    // TODO not all errors are 404
+    let device = db()
+        .query_device_by_id(id)
+        .await
+        .map_err(|f| Status::NotFound)?;
+
+    dev_pipes.send(id, &body);
+
+    // TODO we can't get the return status, only return the fact that we wrote the event
+    Ok(Status::Ok)
 }
 
 #[cfg(test)]
