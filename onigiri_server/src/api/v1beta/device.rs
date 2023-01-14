@@ -35,7 +35,7 @@ pub(crate) async fn event_test(dev_pipe: &State<DevPipe>) -> EventStream![] {
 
 /// [Device Facing] Register itself to listen for events
 // TEMP devices specify their own id
-#[get("/device/listen/<device_id>")]
+#[get("/device/event/<device_id>")]
 pub(crate) fn event_listen<'a>(
     device_id: PathBuf,
     dev_pipe: &'a State<DevPipe>,
@@ -109,7 +109,7 @@ pub(crate) async fn list(api_key: ApiKeyGuard) -> Result<Json<ListResponse>, Sta
 }
 
 /// [User Facing] Proxies get request to corresponding device
-#[get("/device/<device_id>/<rest..>")]
+#[get("/device/control/<device_id>/<rest..>")]
 pub(crate) async fn control_get(
     device_id: PathBuf,
     rest: PathBuf,
@@ -133,7 +133,7 @@ pub(crate) async fn control_get(
 }
 
 /// [User Facing] Proxies post request to corresponding device
-#[post("/device/<device_id>/<rest..>", data = "<body>")]
+#[post("/device/control/<device_id>/<rest..>", data = "<body>")]
 pub(crate) async fn control_post(
     device_id: PathBuf,
     rest: PathBuf,
