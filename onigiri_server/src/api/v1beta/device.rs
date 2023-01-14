@@ -72,7 +72,10 @@ pub(crate) async fn register(body: Json<RegisterBody<'_>>) -> Result<Status, Sta
 
     db().create_device(body.name, body.ip_address, body.api_type)
         .await
-        .map_err(|f| Status::InternalServerError)?;
+        .map_err(|f| {
+            log::error!("{:?}", f.to_string());
+            Status::InternalServerError
+        })?;
 
     Ok(Status::Ok)
 }
@@ -87,10 +90,10 @@ pub(crate) async fn unregister(device_id: PathBuf) {
 /// [User Facing] Get a list of all registered devices and some information about them
 #[get("/device")]
 pub(crate) async fn list(api_key: ApiKeyGuard) -> Result<Json<ListResponse>, Status> {
-    let mut devices = db()
-        .query_devices()
-        .await
-        .map_err(|f| Status::InternalServerError)?;
+    let mut devices = db().query_devices().await.map_err(|f| {
+        log::error!("{:?}", f.to_string());
+        Status::InternalServerError
+    })?;
 
     // TODO right now Device id is being returned as `device:<id>`, should really only be `<id>`
     // fixing it here is just temporary, other routes might also return the device from querying

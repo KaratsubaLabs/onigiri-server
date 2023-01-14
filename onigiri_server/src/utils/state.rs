@@ -41,10 +41,12 @@ impl MultiPipe {
         pipe.get_mut(namespace)
             .unwrap()
             .push_front(data.to_string());
+        log::info!("[pipe] namespace: {}, data: {}", namespace, data);
     }
 
     pub fn read(&self, namespace: &str) -> Option<String> {
         let mut pipes = self.0.lock().unwrap();
+        log::info!("[pipe] read from namespace {}", namespace);
         pipes.get_mut(namespace).and_then(|n| n.pop_back())
     }
 

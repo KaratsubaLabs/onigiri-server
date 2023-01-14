@@ -60,7 +60,7 @@ impl DB {
         debug!("query: {}", body);
         let res = Client::new()
             .post(format!("{}/sql", self.database_url))
-            .header("Content-Type", "application/json")
+            .header("Accept", "application/json")
             .header("NS", self.namespace.to_owned())
             .header("DB", self.database.to_owned())
             .basic_auth(self.username.to_owned(), Some(self.password.to_owned()))
@@ -71,6 +71,7 @@ impl DB {
 
         let status = Status::new(res.status().as_u16());
         if status != Status::Ok {
+            log::error!("db error {:?}", res.text().await);
             return Err(DBError::DBResponseNotOk(status));
         }
 
