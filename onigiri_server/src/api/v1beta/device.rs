@@ -9,11 +9,28 @@ use onigiri_types::{
     db::{ApiType, Device},
 };
 use reqwest::Client;
-use rocket::{futures::TryFutureExt, http::Status, serde::json::Json};
+use rocket::{
+    futures::TryFutureExt,
+    http::Status,
+    response::stream::{Event, EventStream},
+    serde::json::Json,
+    tokio::time::{self, Duration},
+};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 
 use crate::{api::guards::ApiKeyGuard, db::db};
+
+#[post("/device/event_test")]
+pub(crate) async fn event_test() -> EventStream![] {
+    EventStream! (
+        let mut interval = time::interval(Duration::from_secs(1));
+        loop {
+            yield Event::data("ping");
+            interval.tick().await;
+        }
+    )
+}
 
 /// [Device Facing] A device can ping this endpoint to register themselves
 // TODO device facing endpoints maybe should be under a different path?
