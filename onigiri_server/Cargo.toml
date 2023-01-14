@@ -22,9 +22,6 @@ lazy_static = "1.4"
 
 onigiri_types = { git = "https://github.com/KaratsubaLabs/onigiri-server" }
 
-[features]
-debug = []
-
 [dev-dependencies]
 env_logger = { version = "0.9" }
 tokio = { version = "1.21", features = ["macros"] }

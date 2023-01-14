@@ -1,10 +1,12 @@
 #![allow(unused)]
 #![allow(dead_code)]
 
+use settings::SETTINGS_NO_API_KEY;
 use utils::state::{ClientPipe, DevPipe};
 
 mod api;
 mod db;
+mod settings;
 mod utils;
 
 #[macro_use]
@@ -14,8 +16,9 @@ extern crate rocket;
 async fn main() -> Result<(), rocket::Error> {
     env_logger::builder().init();
 
-    #[cfg(feature = "debug")]
-    log::warn!("Debug mode is enabled, security is loosened.");
+    if *SETTINGS_NO_API_KEY {
+        log::warn!("Debug mode is enabled, security is loosened.");
+    }
 
     log::info!("Starting server...");
 

@@ -8,7 +8,7 @@ COPY ./Cargo.toml ./Cargo.toml
 COPY ./Rocket.toml ./Rocket.toml
 
 # cache dependencies
-RUN cargo build --release --features=debug
+RUN cargo build --release
 RUN rm src/*.rs
 
 # build the project

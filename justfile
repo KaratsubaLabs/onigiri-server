@@ -2,7 +2,7 @@
 default: debug
 
 debug:
-    RUST_LOG=onigiri_server=debug,info cargo watch -x run --features=debug
+    RUST_LOG=onigiri_server=debug,info cargo watch -x run
 
 run:
     RUST_LOG=onigiri_server=debug,info cargo run
