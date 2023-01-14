@@ -5,7 +5,7 @@ use rocket::{
     Request,
 };
 
-use crate::db::db;
+use crate::{db::db, settings::SETTINGS_NO_API_KEY};
 
 /// Request guard that ensures that a valid API key is included in the `X-API-KEY` header
 pub struct ApiKeyGuard;
@@ -21,9 +21,10 @@ impl<'r> FromRequest<'r> for ApiKeyGuard {
         };
 
         // use a hardcoded valid API key for testing purposes
-        #[cfg(feature = "debug")]
-        if api_key == "API_KEY" {
-            return Outcome::Success(ApiKeyGuard);
+        if *SETTINGS_NO_API_KEY {
+            if api_key == "API_KEY" {
+                return Outcome::Success(ApiKeyGuard);
+            }
         }
 
         if db().query_apikey_by_id(api_key).await.is_err() {

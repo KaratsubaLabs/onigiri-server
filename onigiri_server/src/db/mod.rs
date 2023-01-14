@@ -1,6 +1,10 @@
 //! wrapper around surrealdb http interface
-use std::net::{IpAddr, Ipv4Addr};
+use std::{
+    env,
+    net::{IpAddr, Ipv4Addr},
+};
 
+use lazy_static::lazy_static;
 use log::{debug, info};
 use onigiri_types::db::{ApiKey, ApiType, Device};
 use reqwest::Client;
@@ -10,6 +14,14 @@ use serde_json::Value;
 use thiserror::Error;
 
 use crate::utils::apikey::generate_apikey;
+
+lazy_static! {
+    static ref DB_URL: String = env::var("ONIGIRI_DB_URL").unwrap_or("127.0.0.1".into());
+    static ref DB_NAMESPACE: String = env::var("ONIGIRI_DB_NAMESPACE").unwrap_or("onigiri".into());
+    static ref DB_NAME: String = env::var("ONIGIRI_DB_NAME").unwrap_or("onigiri".into());
+    static ref DB_USERNAME: String = env::var("ONIGIRI_DB_USERNAME").unwrap_or("admin".into());
+    static ref DB_PASSWORD: String = env::var("ONIGIRI_DB_PASSWORD").unwrap_or("password".into());
+}
 
 #[derive(Error, Debug)]
 pub enum DBError {
@@ -35,11 +47,11 @@ pub struct DB {
 
 pub fn db() -> DB {
     DB {
-        database_url: "http://localhost:8000".into(),
-        namespace: "test".into(),
-        database: "test".into(),
-        username: "root".into(),
-        password: "root".into(),
+        database_url: DB_URL.to_string(),
+        namespace: DB_NAMESPACE.to_string(),
+        database: DB_NAME.to_string(),
+        username: DB_USERNAME.to_string(),
+        password: DB_PASSWORD.to_string(),
     }
 }
 
@@ -174,6 +186,7 @@ impl DB {
 #[cfg(test)]
 mod tests {
     use super::db;
+    use crate::db::DB_URL;
 
     // TODO async tests
     /*
@@ -187,4 +200,9 @@ mod tests {
         assert!(db().create_user("bill", "abc123").await.is_ok());
     }
     */
+
+    #[test]
+    fn read_db_conf() {
+        println!("{}", DB_URL.as_str());
+    }
 }
