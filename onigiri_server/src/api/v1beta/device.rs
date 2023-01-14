@@ -21,7 +21,7 @@ use serde_json::{json, Value};
 
 use crate::{api::guards::ApiKeyGuard, db::db};
 
-#[post("/device/event_test")]
+#[get("/device/event_test")]
 pub(crate) async fn event_test() -> EventStream![] {
     EventStream! (
         let mut interval = time::interval(Duration::from_secs(1));
