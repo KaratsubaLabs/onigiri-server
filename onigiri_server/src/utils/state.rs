@@ -1,13 +1,30 @@
 use std::{
     collections::{HashMap, VecDeque},
+    ops::Deref,
     sync::{Arc, Mutex},
 };
 
 /// queue of messages to pass to each device
-pub type DevPipe = MultiPipe;
+#[derive(Default)]
+pub struct DevPipe(MultiPipe);
+
+impl Deref for DevPipe {
+    type Target = MultiPipe;
+    fn deref(&self) -> &Self::Target {
+        return &self.0;
+    }
+}
 
 /// queue of messages to pass to each client
-pub type ClientPipe = MultiPipe;
+#[derive(Default)]
+pub struct ClientPipe(MultiPipe);
+
+impl Deref for ClientPipe {
+    type Target = MultiPipe;
+    fn deref(&self) -> &Self::Target {
+        return &self.0;
+    }
+}
 
 /// Collection of pipes with name associated with each
 // TODO make this generic

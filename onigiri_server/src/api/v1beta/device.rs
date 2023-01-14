@@ -27,7 +27,7 @@ pub(crate) async fn event_test(dev_pipe: &State<DevPipe>) -> EventStream![] {
     EventStream! (
         let mut interval = time::interval(Duration::from_secs(1));
         loop {
-        yield Event::data("ping");
+            yield Event::data("{ \"state\": \"on\" }");
             interval.tick().await;
         }
     )
