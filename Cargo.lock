@@ -847,6 +847,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "env_logger",
+ "lazy_static",
  "log",
  "onigiri_types 0.1.0 (git+https://github.com/KaratsubaLabs/onigiri-server)",
  "reqwest",

@@ -18,6 +18,7 @@ uuid = { version = "1.1", features = ["v5"] }
 
 log = { version = "0.4" }
 env_logger = { version = "0.9" }
+lazy_static = "1.4"
 
 onigiri_types = { git = "https://github.com/KaratsubaLabs/onigiri-server" }
 
