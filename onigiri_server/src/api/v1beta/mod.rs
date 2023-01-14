@@ -22,6 +22,8 @@ pub fn routes() -> Vec<Route> {
         device::register,
         device::list,
         device::control_get,
-        device::control_post
+        device::control_post,
+        // device::client_event_listen,
+        // device::client_event_push,
     ]
 }

@@ -23,8 +23,8 @@ test:
     RUST_LOG=onigiri_server=debug cargo test -- --nocapture
 
 db-up:
-    docker run --rm -p 8000:8000 surrealdb/surrealdb:latest start --log debug --user root --pass root memory
+    docker run --rm -p 8000:8000 surrealdb/surrealdb:latest start --log debug --user admin --pass password memory
 
 repl:
-    surreal sql --conn http://localhost:8000 --user root --pass root --ns test --db test
+    surreal sql --conn http://localhost:8000 --user admin --pass password --ns onigiri --db onigiri
 

@@ -22,40 +22,6 @@ use serde_json::{json, Value};
 
 use crate::{api::guards::ApiKeyGuard, db::db, utils::state::DevPipe};
 
-#[get("/device/event_test")]
-pub(crate) async fn event_test(dev_pipe: &State<DevPipe>) -> EventStream![] {
-    EventStream! (
-        let mut interval = time::interval(Duration::from_secs(1));
-        loop {
-            yield Event::data("{ \"state\": \"on\" }");
-            interval.tick().await;
-        }
-    )
-}
-
-/// [Device Facing] Register itself to listen for events
-// TEMP devices specify their own id
-#[get("/device/event/<device_id>")]
-pub(crate) fn event_listen<'a>(
-    device_id: PathBuf,
-    dev_pipe: &'a State<DevPipe>,
-) -> EventStream![Event + '_] {
-    // retrieve device id
-    let id = device_id.to_str().unwrap_or_default().to_string();
-
-    // register self with device identity into connection pool
-
-    EventStream! (
-        let mut interval = time::interval(Duration::from_secs(1));
-        loop {
-        for e in dev_pipe.read_all(&id) {
-        yield Event::data(e);
-        }
-            interval.tick().await;
-        }
-    )
-}
-
 /// [Device Facing] A device can ping this endpoint to register themselves
 // TODO device facing endpoints maybe should be under a different path?
 // TODO, should technically be "device/<device_id>"? only issue is that this allows the device
@@ -108,8 +74,10 @@ pub(crate) async fn list(api_key: ApiKeyGuard) -> Result<Json<ListResponse>, Sta
     Ok(Json(ListResponse { devices }))
 }
 
+// CONTROL API (bi-directional REST)
+
 /// [User Facing] Proxies get request to corresponding device
-#[get("/device/control/<device_id>/<rest..>")]
+#[get("/control/device/<device_id>/<rest..>")]
 pub(crate) async fn control_get(
     device_id: PathBuf,
     rest: PathBuf,
@@ -133,7 +101,7 @@ pub(crate) async fn control_get(
 }
 
 /// [User Facing] Proxies post request to corresponding device
-#[post("/device/control/<device_id>/<rest..>", data = "<body>")]
+#[post("/control/device/<device_id>/<rest..>", data = "<body>")]
 pub(crate) async fn control_post(
     device_id: PathBuf,
     rest: PathBuf,
@@ -155,8 +123,44 @@ pub(crate) async fn control_post(
     Ok(Status::new(device_res.status().as_u16()))
 }
 
+// EVENT API (REST + EVENT SOURCE)
+
+#[get("/event/device/event_test")]
+pub(crate) async fn event_test(dev_pipe: &State<DevPipe>) -> EventStream![] {
+    EventStream! (
+        let mut interval = time::interval(Duration::from_secs(1));
+        loop {
+            yield Event::data("{ \"state\": \"on\" }");
+            interval.tick().await;
+        }
+    )
+}
+
+/// [Device Facing] Register itself to listen for events
+// TEMP devices specify their own id
+#[get("/event/device/<device_id>")]
+pub(crate) fn event_listen<'a>(
+    device_id: PathBuf,
+    dev_pipe: &'a State<DevPipe>,
+) -> EventStream![Event + '_] {
+    // retrieve device id
+    let id = device_id.to_str().unwrap_or_default().to_string();
+
+    // register self with device identity into connection pool
+
+    EventStream! (
+        let mut interval = time::interval(Duration::from_secs(1));
+        loop {
+        for e in dev_pipe.read_all(&id) {
+        yield Event::data(e);
+        }
+            interval.tick().await;
+        }
+    )
+}
+
 /// [User Facing] Proxies post request to corresponding device event mode
-#[post("/device/event/<device_id>", data = "<body>")]
+#[post("/event/device/<device_id>", data = "<body>")]
 pub(crate) async fn event_push(
     device_id: PathBuf,
     body: String,
@@ -175,6 +179,39 @@ pub(crate) async fn event_push(
     // TODO we can't get the return status, only return the fact that we wrote the event
     Ok(Status::Ok)
 }
+
+/*
+/// [Client Facing] Register itself to listen for events
+#[get("/device/client")]
+pub(crate) fn client_event_listen<'a>(
+    client_pipe: &'a State<ClientPipe>,
+    api_key: ApiKeyGuard,
+) -> EventStream![Event + '_] {
+
+    EventStream! (
+        let mut interval = time::interval(Duration::from_secs(1));
+        loop {
+        for e in client_pipe.read_all(&id) {
+        yield Event::data(e);
+        }
+            interval.tick().await;
+        }
+    )
+}
+
+/// [DeviceFacing] Proxies post request to corresponding client event mode
+// TODO currently broadcases to all clients
+#[post("/device/client", data = "<body>")]
+pub(crate) async fn event_push(
+    body: String,
+    client_pipes: &State<ClientPipe>,
+) -> Result<Status, Status> {
+
+    client_pipes.send(id, &body);
+
+    Ok(Status::Ok)
+}
+*/
 
 #[cfg(test)]
 mod tests {

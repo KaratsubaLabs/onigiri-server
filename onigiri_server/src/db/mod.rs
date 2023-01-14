@@ -16,7 +16,8 @@ use thiserror::Error;
 use crate::utils::apikey::generate_apikey;
 
 lazy_static! {
-    static ref DB_URL: String = env::var("ONIGIRI_DB_URL").unwrap_or("127.0.0.1".into());
+    static ref DB_URL: String =
+        env::var("ONIGIRI_DB_URL").unwrap_or("http://127.0.0.1:8000".into());
     static ref DB_NAMESPACE: String = env::var("ONIGIRI_DB_NAMESPACE").unwrap_or("onigiri".into());
     static ref DB_NAME: String = env::var("ONIGIRI_DB_NAME").unwrap_or("onigiri".into());
     static ref DB_USERNAME: String = env::var("ONIGIRI_DB_USERNAME").unwrap_or("admin".into());
@@ -118,6 +119,7 @@ impl DB {
         Ok(())
     }
 
+    // TODO decide difference between name and id
     pub async fn create_device(
         &self,
         name: &str,
@@ -125,7 +127,7 @@ impl DB {
         api_type: ApiType,
     ) -> Result<()> {
         self.query(&format!(
-            r#"CREATE devices SET name="{0}", ip_address="{1}", api_type="{2}";"#,
+            r#"CREATE devices:{0} SET name="{0}", ip_address="{1}", api_type="{2}";"#,
             name,
             ip_address.to_string(),
             api_type.to_string(),
