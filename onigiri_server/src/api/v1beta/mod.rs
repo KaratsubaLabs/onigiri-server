@@ -16,6 +16,7 @@ pub fn routes() -> Vec<Route> {
         // auth::register,
         // auth::login,
         auth::create_apikey,
+        device::event_test,
         device::register,
         device::list,
         device::control_get,
